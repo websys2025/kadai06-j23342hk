@@ -1,0 +1,54 @@
+# kadai6-2.py
+
+"""
+東京都オープンデータAPIを用いて、2021年の日別陽性者数を取得・表示します。
+
+- エンドポイント（JSON形式）:
+  POST https://service.api.metro.tokyo.lg.jp/api/{API_ID}/json?limit=365
+- 主なリクエスト要素:
+  - column: 必要なカラム名を配列で指定
+  - searchCondition: 日付範囲を指定するフィルタ
+"""
+
+import requests
+
+API_ID = "t000001d0000000011-819fb24a2e74a5f2ea848d548c5cff7d-0"
+BASE_URL = f"https://service.api.metro.tokyo.lg.jp/api/{API_ID}/json"
+
+def fetch_covid_data(start_date, end_date, limit=365):
+    url = f"{BASE_URL}?limit={limit}"
+    payload = {
+        "column": [
+            "公表_年月日",
+            "日別陽性者数",
+            "7日間合計陽性者数",
+            "7日間平均陽性者数"
+        ],
+        "searchCondition": {
+            "conditionRelationship": "and",
+            "dateAndSearch": [
+                {"column": "公表_年月日", "relationship": "ge", "condition": start_date},
+                {"column": "公表_年月日", "relationship": "le", "condition": end_date}
+            ]
+        }
+    }
+    resp = requests.post(
+        url,
+        headers={"Accept": "application/json", "Content-Type": "application/json"},
+        json=payload
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+def main():
+    try:
+        data = fetch_covid_data("2021/1/1", "2021/12/31", limit=365)
+    except requests.exceptions.HTTPError as e:
+        print("APIリクエストでエラー発生:", e)
+        return
+
+    for row in data.get("hits", []):
+        print(f"{row['公表_年月日']}, {row['日別陽性者数']}, {row['7日間合計陽性者数']}, {row['7日間平均陽性者数']}")
+
+if __name__ == "__main__":
+    main()
