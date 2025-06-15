@@ -1,0 +1,35 @@
+import requests
+
+# E-Stat APIのアプリケーションID
+APP_ID = "265a964bc6d15a16e5ad6b4848f2b5dd0bc217ef"
+# E-Stat APIの統計データ取得エンドポイントURL
+API_URL = "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"
+
+# APIリクエストのパラメータを定義
+params = {
+    "appId": APP_ID,  # アプリケーションID (必須)
+    "statsDataId": "0002116748",  # 統計表ID: "農業経営統計調査"に関連する統計データを指定
+    "searchWord": "農業経営統計調査",  # 検索キーワード: "農業経営統計調査"を含むデータを検索
+    "cdArea": "7000",  # 地域コード: "7000"は福島を表す
+    "openYears": 202502,  # 公開年月: 2025年2月に公開されたデータを指定
+    "cdCat01": "A1101",  # 分類事項コード: "A1101"は特定の分類項目を表す（統計表ごとのメタデータで確認可能）
+    "metaGetFlg": "Y",  # メタデータ取得フラグ: "Y"を指定するとメタデータも取得される
+    "cntGetFlg": "N",  # 表示項目取得フラグ: "N"を指定すると表示項目は取得されない
+    "lang": "J"  # 言語指定
+}
+
+response = requests.get(API_URL, params=params)
+
+
+data = response.json()
+
+print(data)
+
+# データの種類:
+# このコードは、E-Stat APIを通じて「農業経営統計調査」に関連する統計データを取得しています。
+
+# エンドポイントと機能:
+# エンドポイント: "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"
+# 機能: E-Statが提供する統計データを取得するための主要なエンドポイントの一つです。
+# ユーザーはパラメータを通じて、取得したい統計データの種類、期間、地域、分類などを細かく指定できます。
+# このエンドポイントは、CSVやXMLなどの他の形式でもデータを提供できますが、このコードではJSON形式で取得しています。
